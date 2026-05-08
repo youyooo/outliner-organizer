@@ -1,7 +1,7 @@
 bl_info = {
     "name": "Outliner Organizer",
     "author": "",
-    "version": (1, 0, 0),
+    "version": (1, 1, 0),
     "blender": (4, 0, 0),
     "location": "Outliner > Right Click",
     "description": "Right-click in Outliner to create collections and move objects in one step",
@@ -11,13 +11,25 @@ bl_info = {
 import bpy
 from bpy.types import Operator
 
+# ── Internationalization ──────────────────────────────────────────────
+
+TRANSLATIONS = {
+    "zh_CN": {
+        ("*", "New Collection for Selected"):
+            "为所选项新建文件夹",
+        ("*", "New Collection per Selected"):
+            "为所选新建独立文件夹",
+    },
+}
+
+# ── Operators ─────────────────────────────────────────────────────────
 
 class OUTLINER_OT_new_collection_move(Operator):
     """Create a new collection named after the selection and move objects into it.
     Single object → new collection with same name.
     Multiple objects → one collection named after the right-clicked (active) object."""
     bl_idname = "outliner.new_collection_move"
-    bl_label = "为所选项新建文件夹"
+    bl_label = "New Collection for Selected"
     bl_translation_context = "*"
     bl_options = {"REGISTER", "UNDO"}
 
@@ -58,7 +70,7 @@ class OUTLINER_OT_new_collection_each(Operator):
     Single object → same as New Collection & Move.
     Multiple objects → one collection per object, each with the object's name."""
     bl_idname = "outliner.new_collection_each"
-    bl_label = "为选中项新建独立文件夹"
+    bl_label = "New Collection per Selected"
     bl_translation_context = "*"
     bl_options = {"REGISTER", "UNDO"}
 
@@ -101,12 +113,14 @@ classes = [
 
 
 def register():
+    bpy.app.translations.register(__name__, TRANSLATIONS)
     for cls in classes:
         bpy.utils.register_class(cls)
     bpy.types.OUTLINER_MT_object.prepend(draw_outliner_object_menu)
 
 
 def unregister():
+    bpy.app.translations.unregister(__name__)
     bpy.types.OUTLINER_MT_object.remove(draw_outliner_object_menu)
     for cls in reversed(classes):
         bpy.utils.unregister_class(cls)
