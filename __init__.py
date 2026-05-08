@@ -3,13 +3,13 @@ bl_info = {
     "author": "",
     "version": (1, 0, 0),
     "blender": (4, 0, 0),
-    "location": "Outliner > Right Click > Organize",
+    "location": "Outliner > Right Click",
     "description": "Right-click in Outliner to create collections and move objects in one step",
     "category": "Interface",
 }
 
 import bpy
-from bpy.types import Menu, Operator
+from bpy.types import Operator
 
 
 class OUTLINER_OT_new_collection_move(Operator):
@@ -17,7 +17,8 @@ class OUTLINER_OT_new_collection_move(Operator):
     Single object → new collection with same name.
     Multiple objects → one collection named after the right-clicked (active) object."""
     bl_idname = "outliner.new_collection_move"
-    bl_label = "New Collection & Move"
+    bl_label = "为所选项新建文件夹"
+    bl_translation_context = "*"
     bl_options = {"REGISTER", "UNDO"}
 
     @classmethod
@@ -57,7 +58,8 @@ class OUTLINER_OT_new_collection_each(Operator):
     Single object → same as New Collection & Move.
     Multiple objects → one collection per object, each with the object's name."""
     bl_idname = "outliner.new_collection_each"
-    bl_label = "New Collection Each"
+    bl_label = "为选中项新建独立文件夹"
+    bl_translation_context = "*"
     bl_options = {"REGISTER", "UNDO"}
 
     @classmethod
@@ -86,23 +88,13 @@ class OUTLINER_OT_new_collection_each(Operator):
         return {"FINISHED"}
 
 
-class OUTLINER_MT_organize(Menu):
-    bl_idname = "OUTLINER_MT_organize"
-    bl_label = "Organize"
-
-    def draw(self, context):
-        layout = self.layout
-        layout.operator("outliner.new_collection_move", text="New Collection & Move")
-        layout.operator("outliner.new_collection_each", text="New Collection Each")
-
-
 def draw_outliner_object_menu(self, context):
-    self.layout.separator()
-    self.layout.menu("OUTLINER_MT_organize")
+    layout = self.layout
+    layout.operator("outliner.new_collection_move")
+    layout.operator("outliner.new_collection_each")
 
 
 classes = [
-    OUTLINER_MT_organize,
     OUTLINER_OT_new_collection_move,
     OUTLINER_OT_new_collection_each,
 ]
@@ -111,7 +103,7 @@ classes = [
 def register():
     for cls in classes:
         bpy.utils.register_class(cls)
-    bpy.types.OUTLINER_MT_object.append(draw_outliner_object_menu)
+    bpy.types.OUTLINER_MT_object.prepend(draw_outliner_object_menu)
 
 
 def unregister():
